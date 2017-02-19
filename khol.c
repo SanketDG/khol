@@ -24,7 +24,7 @@ int (*builtin_func[]) (char**) = {
     &khol_exit
 };
 
-int lsh_num_builtins() {
+int num_builtins() {
     return sizeof(builtins) / sizeof(char *);
 }
 
@@ -84,7 +84,7 @@ int execute(char **args) {
         return 1;
     }
 
-    for(i = 0; i < lsh_num_builtins(); i++) {
+    for(i = 0; i < num_builtins(); i++) {
         if (!strcmp(args[0], builtins[i])) {
             return (*builtin_func[i])(args);
         }
