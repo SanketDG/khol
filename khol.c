@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <wait.h>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #define MAX_BUFSIZE 1024
 #define TOKEN_BUFSIZE 64
 #define TOKEN_DELIMS " \t\r\n\a"
@@ -125,65 +128,35 @@ char **split_line(char *line) {
     return tokens;
 }
 
-char *read_line(void) {
-    char c;
-    int pos = 0;
-    char *line = malloc(sizeof(char) * MAX_BUFSIZE);
-
-    if(!line) {
-        fprintf(stderr, "KHOL: Memory allocation failed.");
-        exit(EXIT_FAILURE);
-    }
-
-    while (1) {
-
-        c = getchar();
-
-        if(c == EOF && pos == 0) {
-            return NULL;
-        }
-
-        if(c == EOF || c == '\n') {
-            line[pos] = '\0';
-            return line;
-        }
-        else {
-            line[pos] = c;
-        }
-
-        pos++;
-
-        if(pos >= MAX_BUFSIZE) {
-            line = realloc(line, sizeof(char) * MAX_BUFSIZE * 2);
-        }
-
-        if(!line) {
-            fprintf(stderr, "KHOL: Memory re-allocation failed.");
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
 void main_loop(void) {
     char *line;
     char **args;
 
     int status;
 
+    // basic prompt
+    char *prompt = "> ";
+
     do {
-        // basic prompt
-        printf("> ");
-        line = read_line();
-        if(line == NULL) {
+        // use GNU's readline() function
+        line = readline(prompt);
+
+
+        // add to history for future use
+        add_history(line);
+
+        // EOF
+        if(!line) {
             status = 0;
         }
         else {
             args = split_line(line);
             status = execute(args);
+
+            free(args);
         }
 
         free(line);
-        free(args);
     } while ( status );
 }
 
