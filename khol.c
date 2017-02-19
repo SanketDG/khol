@@ -174,10 +174,13 @@ void main_loop(void) {
         // basic prompt
         printf("> ");
         line = read_line();
-        if(line == NULL)
+        if(line == NULL) {
             status = 0;
-        args = split_line(line);
-        status = execute(args);
+        }
+        else {
+            args = split_line(line);
+            status = execute(args);
+        }
 
         free(line);
         free(args);
