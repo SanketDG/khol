@@ -8,6 +8,7 @@
 #include <readline/history.h>
 
 #define MAX_BUFSIZE 1024
+#define PROMPT_MAXSIZE 1024
 #define TOKEN_BUFSIZE 64
 #define TOKEN_DELIMS " \t\r\n\a"
 
@@ -128,17 +129,30 @@ char **split_line(char *line) {
     return tokens;
 }
 
+char *get_prompt(void) {
+    char *prompt, tempbuf[1024];
+
+    prompt = malloc(sizeof(char) * PROMPT_MAXSIZE);
+
+    if( getcwd( tempbuf, sizeof(tempbuf) ) != NULL ) {
+
+        sprintf(prompt, "%s > ", tempbuf);
+        return prompt;
+    }
+}
+
 void main_loop(void) {
     char *line;
     char **args;
 
     int status;
 
-    // basic prompt
-    char *prompt = "> ";
+    // get prompt
+    char *prompt;
 
     do {
         // use GNU's readline() function
+        prompt = get_prompt();
         line = readline(prompt);
 
 
@@ -157,6 +171,7 @@ void main_loop(void) {
         }
 
         free(line);
+        // free(prompt);
     } while ( status );
 }
 
