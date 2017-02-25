@@ -1,7 +1,12 @@
 CC=gcc
 LIBS=-lreadline
 
-khol:
-	$(CC) khol.c -o $@ $(LIBS)
+all: khol
 
-clean: rm khol
+khol: khol.c
+	$(CC) $^ -o $@ $(LIBS)
+
+clean:
+	- rm khol
+
+.PHONY: all test clean
