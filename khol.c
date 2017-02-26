@@ -34,7 +34,7 @@ int num_builtins() {
 
 int cd(char **args) {
     if(args[1] == NULL) {
-        fprintf(stderr, "lsh: expected argument to `cd`\n");
+        fprintf(stderr, "khol: expected argument to `cd`\n");
     } else {
         if(chdir(args[1]) != 0) {
             perror("khol:");
@@ -57,7 +57,7 @@ int khol_exit(char **args)
 }
 
 
-int launch(char **args) {
+int launch(char **args, int fd) {
 
     pid_t pid, wpid;
 
@@ -65,6 +65,16 @@ int launch(char **args) {
 
     if( (pid = fork()) == 0 ) {
         // child process
+
+        if(fd > -1) {
+
+            if(dup2(fd, 1) == -1 ) {
+                perror("Error duplicating stream: ");
+                return 1;
+            }
+
+            close(fd);
+        }
 
         if( execvp(args[0], args) == -1 ) {
             perror("khol");
@@ -94,7 +104,18 @@ int execute(char **args) {
         }
     }
 
-    return launch(args);
+    int j = 0;
+
+    while(args[j] != NULL) {
+        if(!( strcmp(">", args[j]) )) {
+            int fd = fileno(fopen(args[j+1], "w+"));
+            args[j] = NULL;
+            return launch(args, fd);
+        }
+        j++;
+    }
+
+    return launch(args, -1);
 }
 
 char **split_line(char *line) {
