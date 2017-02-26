@@ -107,8 +107,15 @@ int execute(char **args) {
     int j = 0;
 
     while(args[j] != NULL) {
+        // for `>` operator for redirection
         if(!( strcmp(">", args[j]) )) {
             int fd = fileno(fopen(args[j+1], "w+"));
+            args[j] = NULL;
+            return launch(args, fd);
+        }
+        // for `>>` operator for redirection
+        else if(!( strcmp(">>", args[j]) )) {
+            int fd = fileno(fopen(args[j+1], "a+"));
             args[j] = NULL;
             return launch(args, fd);
         }
