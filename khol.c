@@ -14,17 +14,20 @@
 
 int cd(char **args);
 int help(char **args);
+int history(char **args);
 int khol_exit(char **args);
 
 char *builtins[] = {
     "cd",
     "help",
+    "history",
     "exit"
 };
 
 int (*builtin_func[]) (char**) = {
     &cd,
     &help,
+    &history,
     &khol_exit
 };
 
@@ -76,6 +79,7 @@ int launch(char **args, int fd) {
             close(fd);
         }
 
+
         if( execvp(args[0], args) == -1 ) {
             perror("khol");
         }
@@ -89,6 +93,11 @@ int launch(char **args, int fd) {
     }
 
     return 1;
+}
+
+int history(char **args) {
+    char *history_args[4] = {"cat", "-n", ".khol_history", NULL};
+    return launch(history_args, -1);
 }
 
 int execute(char **args) {
@@ -178,6 +187,9 @@ void main_loop(void) {
     // get prompt
     char *prompt;
 
+    // read from history file
+    read_history(".khol_history");
+
     do {
         // use GNU's readline() function
         prompt = get_prompt();
@@ -192,6 +204,9 @@ void main_loop(void) {
             status = 0;
         }
         else {
+            // write to history file
+            write_history(".khol_history");
+
             args = split_line(line);
             status = execute(args);
 
@@ -199,7 +214,6 @@ void main_loop(void) {
         }
 
         free(line);
-        // free(prompt);
     } while ( status );
 }
 
