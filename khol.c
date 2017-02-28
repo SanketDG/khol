@@ -11,6 +11,9 @@
 #define PROMPT_MAXSIZE 1024
 #define TOKEN_BUFSIZE 64
 #define TOKEN_DELIMS " \t\r\n\a"
+#define HISTFILE_SIZE 1024
+
+char *history_path = NULL;
 
 int cd(char **args);
 int help(char **args);
@@ -96,7 +99,7 @@ int launch(char **args, int fd) {
 }
 
 int history(char **args) {
-    char *history_args[4] = {"cat", "-n", ".khol_history", NULL};
+    char *history_args[4] = {"cat", "-n", history_path, NULL};
     return launch(history_args, -1);
 }
 
@@ -187,8 +190,14 @@ void main_loop(void) {
     // get prompt
     char *prompt;
 
+    char *homedir = getenv("HOME");
+
+    history_path = malloc(sizeof(char) * HISTFILE_SIZE);
+
+    sprintf(history_path, "%s/%s", homedir, ".khol_history");
+
     // read from history file
-    read_history(".khol_history");
+    read_history(history_path);
 
     do {
         // use GNU's readline() function
@@ -205,7 +214,7 @@ void main_loop(void) {
         }
         else {
             // write to history file
-            write_history(".khol_history");
+            write_history(history_path);
 
             args = split_line(line);
             status = execute(args);
