@@ -44,4 +44,4 @@ char *builtins[] = {
 
 /* terminal colors */
 #define YELLOW "\e[33m"
-#define RED "\e[30m"
+#define RED "\e[31m"

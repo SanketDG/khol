@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +34,7 @@ int khol_cd(char **args) {
         fprintf(stderr, YELLOW "khol: expected argument to `cd`\n" RESET);
     } else {
         if(chdir(args[1]) != 0) {
-            perror(RED "khol: " RESET);
+            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
         }
     }
 
@@ -72,7 +73,7 @@ int launch(char **args, int fd) {
         if(fd > -1) {
 
             if(dup2(fd, 1) == -1 ) {
-                perror(RED "Error duplicating stream: " RESET);
+                fprintf(stderr, RED "khol: Error duplicating stream: %s\n" RESET, strerror(errno));
                 return 1;
             }
 
@@ -81,7 +82,7 @@ int launch(char **args, int fd) {
 
 
         if( execvp(args[0], args) == -1 ) {
-            perror(RED "khol: " RESET);
+            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
