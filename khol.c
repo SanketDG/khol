@@ -211,9 +211,22 @@ void main_loop(void) {
             // write to history file
             write_history(history_path);
 
-            args = split_line(line);
-            status = execute(args);
+            if(line[0] == '!' && !line[1]) {
+                int index;
+                sscanf(line, "!%d", &index);
+                args = split_line(history_get(index)->line);
+            }
+            else if(line[0] == '!' && line[1] == '-') {
+                int index;
+                sscanf(line, "!-%d", &index);
 
+                args = split_line(history_get(history_length - index + 1)->line);
+            }
+            else {
+                args = split_line(line);
+            }
+
+            status = execute(args);
             free(args);
         }
 
