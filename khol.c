@@ -1,17 +1,14 @@
+#include <limits.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <wait.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#define MAX_BUFSIZE 1024
-#define PROMPT_MAXSIZE 1024
-#define TOKEN_BUFSIZE 64
-#define TOKEN_DELIMS " \t\r\n\a"
-#define HISTFILE_SIZE 1024
+#include "constants.h"
 
 char *history_path = NULL;
 
@@ -170,7 +167,7 @@ char **split_line(char *line) {
 }
 
 char *get_prompt(void) {
-    char *prompt, tempbuf[1024];
+    char *prompt, tempbuf[PATH_MAX];
 
     prompt = malloc(sizeof(char) * PROMPT_MAXSIZE);
 
@@ -225,7 +222,7 @@ void main_loop(void) {
         free(line);
     } while ( status );
 
-    free(history_path)
+    free(history_path);
 }
 
 int main(int argc, char* argv[]) {
