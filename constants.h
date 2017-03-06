@@ -27,3 +27,11 @@
 #define TOKEN_BUFSIZE 64 /* Maximum size of each of the tokens in the command */
 #define TOKEN_DELIMS " \t\r\n\a" /* token delimeters */
 #define HISTFILE_SIZE 1024 /* Size of the history file */
+
+/* list of builtins in the shell */
+char *builtins[] = {
+    "cd",
+    "help",
+    "history",
+    "exit"
+};

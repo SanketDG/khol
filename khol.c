@@ -17,13 +17,6 @@ int help(char **args);
 int history(char **args);
 int khol_exit(char **args);
 
-char *builtins[] = {
-    "cd",
-    "help",
-    "history",
-    "exit"
-};
-
 int (*builtin_func[]) (char**) = {
     &cd,
     &help,
