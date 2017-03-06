@@ -35,3 +35,11 @@ char *builtins[] = {
     "history",
     "exit"
 };
+
+/* terminal styles */
+#define RESET "\e[0m"
+#define BOLD "\e[1m"
+
+/* terminal colors */
+#define YELLOW "\e[33m"
+#define RED "\e[30m"

@@ -30,10 +30,10 @@ int num_builtins() {
 
 int cd(char **args) {
     if(args[1] == NULL) {
-        fprintf(stderr, "khol: expected argument to `cd`\n");
+        fprintf(stderr, YELLOW "khol: expected argument to `cd`\n" RESET);
     } else {
         if(chdir(args[1]) != 0) {
-            perror("khol:");
+            perror(RED "khol: " RESET);
         }
     }
 
@@ -42,7 +42,9 @@ int cd(char **args) {
 
 int help(char **args) {
     int i;
-    printf("KHOL: A minimalistic shell\n");
+    printf(BOLD"khol: A minimalistic shell written in C."
+               "\nCopyright (C) 2017 Sanket Dasgupta\n"
+           RESET);
 
     return 1;
 }
@@ -65,7 +67,7 @@ int launch(char **args, int fd) {
         if(fd > -1) {
 
             if(dup2(fd, 1) == -1 ) {
-                perror("Error duplicating stream: ");
+                perror(RED "Error duplicating stream: " RESET);
                 return 1;
             }
 
@@ -74,7 +76,7 @@ int launch(char **args, int fd) {
 
 
         if( execvp(args[0], args) == -1 ) {
-            perror("khol");
+            perror(RED "khol: " RESET);
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
@@ -134,7 +136,7 @@ char **split_line(char *line) {
     int pos = 0;
 
     if(!tokens) {
-        fprintf(stderr, "KHOL: Memory allocation failed.");
+        fprintf(stderr, RED "khol: Memory allocation failed." RESET);
         exit(EXIT_FAILURE);
     }
 
@@ -147,7 +149,7 @@ char **split_line(char *line) {
             tokens = realloc(tokens, sizeof(char*) * TOKEN_BUFSIZE * 2);
 
             if(!token) {
-                fprintf(stderr, "KHOL: Memory allocation failed.");
+                fprintf(stderr, RED "khol: Memory allocation failed." RESET);
                 exit(EXIT_FAILURE);
             }
         }
