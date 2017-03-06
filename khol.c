@@ -12,15 +12,15 @@
 
 char *history_path = NULL;
 
-int cd(char **args);
-int help(char **args);
-int history(char **args);
+int khol_cd(char **args);
+int khol_help(char **args);
+int khol_history(char **args);
 int khol_exit(char **args);
 
 int (*builtin_func[]) (char**) = {
-    &cd,
-    &help,
-    &history,
+    &khol_cd,
+    &khol_help,
+    &khol_history,
     &khol_exit
 };
 
@@ -28,7 +28,7 @@ int num_builtins() {
     return sizeof(builtins) / sizeof(char *);
 }
 
-int cd(char **args) {
+int khol_cd(char **args) {
     if(args[1] == NULL) {
         fprintf(stderr, YELLOW "khol: expected argument to `cd`\n" RESET);
     } else {
@@ -40,7 +40,7 @@ int cd(char **args) {
     return 1;
 }
 
-int help(char **args) {
+int khol_help(char **args) {
     int i;
     printf(BOLD"khol: A minimalistic shell written in C."
                "\nCopyright (C) 2017 Sanket Dasgupta\n"
@@ -90,7 +90,7 @@ int launch(char **args, int fd) {
     return 1;
 }
 
-int history(char **args) {
+int khol_history(char **args) {
     char *history_args[4] = {"cat", "-n", history_path, NULL};
     return launch(history_args, -1);
 }
@@ -183,10 +183,8 @@ void main_loop(void) {
     char *prompt;
 
     char *homedir = getenv("HOME");
-
     history_path = malloc(sizeof(char) * HISTFILE_SIZE);
-
-    sprintf(history_path, "%s/%s", homedir, ".khol_history");
+    sprintf(history_path, "%s/%s", homedir, HISTFILE);
 
     // read from history file
     read_history(history_path);
