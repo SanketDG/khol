@@ -224,6 +224,8 @@ void main_loop(void) {
 
         free(line);
     } while ( status );
+
+    free(history_path)
 }
 
 int main(int argc, char* argv[]) {
