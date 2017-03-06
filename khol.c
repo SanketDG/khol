@@ -43,8 +43,13 @@ int khol_cd(char **args) {
 int khol_help(char **args) {
     int i;
     printf(BOLD"khol: A minimalistic shell written in C."
-               "\nCopyright (C) 2017 Sanket Dasgupta\n"
-           RESET);
+               "\nCopyright (C) 2017 Sanket Dasgupta\n"RESET
+               "Builtin commands:\n"
+               "cd - Change dicrectory\n"
+               "history - Show history from ~/.khol_history\n"
+               "exit - Exit this shell"
+               "help - Show this help\n"
+           );
 
     return 1;
 }
