@@ -26,7 +26,6 @@
 #define PROMPT_MAXSIZE 1024 /* Maximum size of the prompt */
 #define TOKEN_BUFSIZE 64 /* Maximum size of each of the tokens in the command */
 #define TOKEN_DELIMS " \t\r\n\a" /* token delimeters */
-#define HISTFILE_SIZE 1024 /* Size of the history file */
 
 #define HISTFILE ".khol_history"
 

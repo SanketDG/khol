@@ -1,4 +1,4 @@
-# khol - A minimalistic shell written in C
+# khol (খোল) - A minimalistic shell written in C
 
 <p align="center">
   <img src="logo.png"/>
