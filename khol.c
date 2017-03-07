@@ -1,5 +1,5 @@
 /*
- * Some helpful constants for the shell
+ * khol (খোল) - A minimalistic shell written in C
  *
  * Copyright (C) 2017 Sanket Dasgupta
  *
