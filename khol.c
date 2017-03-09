@@ -116,6 +116,9 @@ int launch(char **args, int fd, int bg) {
             if( !bg ) {
                 wpid = waitpid(pid, &status, WUNTRACED);
             }
+            else {
+                printf(YELLOW "[bg][%d] - %s\n" RESET, pid, args[0]);
+            }
         } while ( !WIFEXITED(status) && !WIFSIGNALED(status) );
     }
 
