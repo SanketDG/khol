@@ -85,7 +85,7 @@ int khol_exit(char **args)
 }
 
 
-int launch(char **args, int fd) {
+int launch(char **args, int fd, int bg) {
 
     pid_t pid, wpid;
 
@@ -113,8 +113,10 @@ int launch(char **args, int fd) {
         // Error forking, do something!
     } else {
         do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        }   while ( !WIFEXITED(status) && !WIFSIGNALED(status) );
+            if( !bg ) {
+                wpid = waitpid(pid, &status, WUNTRACED);
+            }
+        } while ( !WIFEXITED(status) && !WIFSIGNALED(status) );
     }
 
     return 1;
@@ -122,7 +124,7 @@ int launch(char **args, int fd) {
 
 int khol_history(char **args) {
     char *history_args[4] = {"cat", "-n", history_path, NULL};
-    return launch(history_args, -1);
+    return launch(history_args, -1, 0);
 }
 
 int execute(char **args) {
@@ -132,8 +134,19 @@ int execute(char **args) {
         return 1;
     }
 
+    i = 0;
+    while(args[i]) {
+        i++;
+    }
+
+    /* launch process in background */
+    if( !strcmp("&", args[--i]) ) {
+        args[i] = NULL;
+        return launch(args, -1, 1);
+    }
+
     for(i = 0; i < num_builtins(); i++) {
-        if (!strcmp(args[0], builtins[i])) {
+        if ( !strcmp(args[0], builtins[i]) ) {
             return (*builtin_func[i])(args);
         }
     }
@@ -142,21 +155,21 @@ int execute(char **args) {
 
     while(args[j] != NULL) {
         // for `>` operator for redirection
-        if(!( strcmp(">", args[j]) )) {
+        if( !strcmp(">", args[j]) ) {
             int fd = fileno(fopen(args[j+1], "w+"));
             args[j] = NULL;
-            return launch(args, fd);
+            return launch(args, fd, 0);
         }
         // for `>>` operator for redirection
-        else if(!( strcmp(">>", args[j]) )) {
+        else if( !strcmp(">>", args[j]) ) {
             int fd = fileno(fopen(args[j+1], "a+"));
             args[j] = NULL;
-            return launch(args, fd);
+            return launch(args, fd, 0);
         }
         j++;
     }
 
-    return launch(args, -1);
+    return launch(args, -1, 0);
 }
 
 char **split_line(char *line) {
