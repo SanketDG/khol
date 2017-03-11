@@ -85,7 +85,11 @@ int khol_exit(char **args)
 }
 
 
-int launch(char **args, int fd, int bg) {
+int launch(char **args, int fd, int options) {
+
+    int khol_bg = 1 ? options & KHOL_BG : 0;
+    int khol_stdout = 1 ? options & KHOL_STDOUT : 0;
+    int khol_stderr = 1 ? options & KHOL_STDERR : 0;
 
     pid_t pid, wpid;
 
@@ -94,9 +98,14 @@ int launch(char **args, int fd, int bg) {
     if( (pid = fork()) == 0 ) {
         // child process
 
-        if(fd > -1) {
+        if(fd > 2) {
 
-            if(dup2(fd, 1) == -1 ) {
+            if(khol_stdout && dup2(fd, STDOUT_FILENO) == -1 ) {
+                fprintf(stderr, RED "khol: Error duplicating stream: %s\n" RESET, strerror(errno));
+                return 1;
+            }
+
+            if(khol_stderr && dup2(fd, STDERR_FILENO) == -1 ) {
                 fprintf(stderr, RED "khol: Error duplicating stream: %s\n" RESET, strerror(errno));
                 return 1;
             }
@@ -113,7 +122,7 @@ int launch(char **args, int fd, int bg) {
         // Error forking, do something!
     } else {
         do {
-            if( !bg ) {
+            if( !khol_bg ) {
                 wpid = waitpid(pid, &status, WUNTRACED);
             }
             else {
@@ -127,7 +136,7 @@ int launch(char **args, int fd, int bg) {
 
 int khol_history(char **args) {
     char *history_args[4] = {"cat", "-n", history_path, NULL};
-    return launch(history_args, -1, 0);
+    return launch(history_args, STDOUT_FILENO, KHOL_FG);
 }
 
 int execute(char **args) {
@@ -145,7 +154,7 @@ int execute(char **args) {
     /* launch process in background */
     if( !strcmp("&", args[--i]) ) {
         args[i] = NULL;
-        return launch(args, -1, 1);
+        return launch(args, STDOUT_FILENO, KHOL_BG);
     }
 
     for(i = 0; i < num_builtins(); i++) {
@@ -157,22 +166,28 @@ int execute(char **args) {
     int j = 0;
 
     while(args[j] != NULL) {
-        // for `>` operator for redirection
+        // for `>` operator for redirection (stdout)
         if( !strcmp(">", args[j]) ) {
             int fd = fileno(fopen(args[j+1], "w+"));
             args[j] = NULL;
-            return launch(args, fd, 0);
+            return launch(args, fd, KHOL_FG);
         }
-        // for `>>` operator for redirection
+        // for `>>` operator for redirection (stdout with append)
         else if( !strcmp(">>", args[j]) ) {
             int fd = fileno(fopen(args[j+1], "a+"));
             args[j] = NULL;
-            return launch(args, fd, 0);
+            return launch(args, fd, KHOL_FG | KHOL_STDOUT);
+        }
+        // for `>&` operator for redirection (stdout and stderr)
+        else if( !strcmp(">&", args[j]) ) {
+            int fd = fileno(fopen(args[j+1], "a+"));
+            args[j] = NULL;
+            return launch(args, fd, KHOL_FG | KHOL_STDERR);
         }
         j++;
     }
 
-    return launch(args, -1, 0);
+    return launch(args, STDOUT_FILENO, KHOL_FG);
 }
 
 char **split_line(char *line) {
