@@ -178,11 +178,17 @@ int execute(char **args) {
             args[j] = NULL;
             return launch(args, fd, KHOL_FG | KHOL_STDOUT);
         }
-        // for `>&` operator for redirection (stdout and stderr)
-        else if( !strcmp(">&", args[j]) ) {
-            int fd = fileno(fopen(args[j+1], "a+"));
+        // for `2>` operator for redirection (stderr)
+        else if( !strcmp("2>", args[j]) ) {
+            int fd = fileno(fopen(args[j+1], "w+"));
             args[j] = NULL;
             return launch(args, fd, KHOL_FG | KHOL_STDERR);
+        }
+        // for `>&` operator for redirection (stdout and stderr)
+        else if( !strcmp(">&", args[j]) ) {
+            int fd = fileno(fopen(args[j+1], "w+"));
+            args[j] = NULL;
+            return launch(args, fd, KHOL_FG | KHOL_STDERR | KHOL_STDOUT);
         }
         j++;
     }
