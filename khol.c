@@ -67,7 +67,7 @@ int khol_cd(char **args) {
 
 int khol_help(char **args) {
     int i;
-    printf(BOLD"khol: A minimalistic shell written in C."
+    printf(BOLD"\nkhol: A minimalistic shell written in C."
                "\nCopyright (C) 2017 Sanket Dasgupta\n\n"RESET
                "Builtin commands:\n"
                "cd - Change dicrectory\n"
@@ -119,7 +119,7 @@ int launch(char **args, int fd, int options) {
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
-        // Error forking, do something!
+        fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
     } else {
         do {
             if( !khol_bg ) {
