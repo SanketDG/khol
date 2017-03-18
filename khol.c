@@ -231,11 +231,13 @@ char **split_line(char *line) {
 char *get_prompt(void) {
     char *prompt, tempbuf[PATH_MAX];
 
-    prompt = malloc(sizeof(char) * PROMPT_MAXSIZE);
+    size_t prompt_len = sizeof(char) * PROMPT_MAXSIZE;
+
+    prompt = malloc(prompt_len);
 
     if( getcwd( tempbuf, sizeof(tempbuf) ) != NULL ) {
 
-        sprintf(prompt, "%s > ", tempbuf);
+        snprintf(prompt, prompt_len, "%s > ", tempbuf);
         return prompt;
     }
 }
@@ -250,8 +252,10 @@ void main_loop(void) {
     char *prompt;
 
     char *homedir = getenv("HOME");
-    history_path = malloc(sizeof(char) * PATH_MAX);
-    sprintf(history_path, "%s/%s", homedir, HISTFILE);
+
+    size_t history_path_len = sizeof(char) * PATH_MAX;
+    history_path = malloc(history_path_len);
+    snprintf(history_path, history_path_len, "%s/%s", homedir, HISTFILE);
 
     // read from history file
     read_history(history_path);
