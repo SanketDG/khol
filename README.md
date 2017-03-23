@@ -8,6 +8,12 @@ Sign graphic by <a href="http://www.flaticon.com/authors/freepik">Freepik</a> fr
 
 ## Install
 
+```
+$ make
+```
+
 ## Usage
 
-## Features
+```
+$ ./khol
+```
