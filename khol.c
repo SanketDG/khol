@@ -42,6 +42,8 @@ int khol_help(char **args);
 int khol_history(char **args);
 int khol_exit(char **args);
 
+
+/* Function pointers that correspond to the buitins */
 int (*builtin_func[]) (char**) = {
     &khol_cd,
     &khol_help,
@@ -49,10 +51,20 @@ int (*builtin_func[]) (char**) = {
     &khol_exit
 };
 
+
+/* Returns the number of builtin commands available for khol */
 int num_builtins() {
     return sizeof(builtins) / sizeof(char *);
 }
 
+/*
+ * Function that implements the khol builtin "cd", to change directories
+ *
+ * The command "cd" needs an argument to change the directory.
+ *
+ * If a argument is not provided, khol raises an warning.
+ *
+ */
 int khol_cd(char **args) {
     if(args[1] == NULL) {
         fprintf(stderr, YELLOW "khol: expected argument to `cd`\n" RESET);
@@ -65,6 +77,7 @@ int khol_cd(char **args) {
     return 1;
 }
 
+/* Function that shows the help message */
 int khol_help(char **args) {
     int i;
     printf(BOLD"\nkhol: A minimalistic shell written in C."
@@ -84,7 +97,16 @@ int khol_exit(char **args)
     return 0;
 }
 
-
+/*
+ * Function that is responsible for launching and handling processes.
+ *
+ * @args:    The argument list provided to the shell. This argument list will
+ *           be used to launch and execute the child process.
+ * @fd:      The file descriptor to be passed, in case of a redirection operator
+ *           being passed to the shell.
+ * @options: A list of options being implemented to handle background processing
+ *           and redirection. The options are defined in constants.h
+ */
 int launch(char **args, int fd, int options) {
 
     int khol_bg = 1 ? options & KHOL_BG : 0;
@@ -140,11 +162,16 @@ int launch(char **args, int fd, int options) {
     return 1;
 }
 
+/* Function that shows the khol history file along with line numbers
+ *
+ * Uses the 'cat' tool with '-n' argument to display line numbers
+ */
 int khol_history(char **args) {
     char *history_args[4] = {"cat", "-n", history_path, NULL};
     return launch(history_args, STDOUT_FILENO, KHOL_FG);
 }
 
+/* Function responsible for parsing the arguments */
 int execute(char **args) {
     int i;
 
@@ -208,6 +235,7 @@ int execute(char **args) {
     return launch(args, STDOUT_FILENO, KHOL_FG);
 }
 
+/* Function that splits the line based on delimeters defined in constants.h */
 char **split_line(char *line) {
     char **tokens = malloc(sizeof(char*) * TOKEN_BUFSIZE);
     char *token;
@@ -240,6 +268,7 @@ char **split_line(char *line) {
     return tokens;
 }
 
+/* Function that returns the prompt */
 char *get_prompt(void) {
     char *prompt, tempbuf[PATH_MAX];
 
@@ -254,6 +283,7 @@ char *get_prompt(void) {
     }
 }
 
+/* The main loop of the shell */
 void main_loop(void) {
     char *line;
     char **args;
