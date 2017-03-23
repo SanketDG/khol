@@ -90,6 +90,7 @@ int launch(char **args, int fd, int options) {
     int khol_bg = 1 ? options & KHOL_BG : 0;
     int khol_stdout = 1 ? options & KHOL_STDOUT : 0;
     int khol_stderr = 1 ? options & KHOL_STDERR : 0;
+    int khol_stdin = 1 ? options & KHOL_STDIN : 0;
 
     pid_t pid, wpid;
 
@@ -106,6 +107,11 @@ int launch(char **args, int fd, int options) {
             }
 
             if(khol_stderr && dup2(fd, STDERR_FILENO) == -1 ) {
+                fprintf(stderr, RED "khol: Error duplicating stream: %s\n" RESET, strerror(errno));
+                return 1;
+            }
+
+            if(khol_stdin && dup2(fd, STDIN_FILENO) == -1 ) {
                 fprintf(stderr, RED "khol: Error duplicating stream: %s\n" RESET, strerror(errno));
                 return 1;
             }
@@ -189,6 +195,12 @@ int execute(char **args) {
             int fd = fileno(fopen(args[j+1], "w+"));
             args[j] = NULL;
             return launch(args, fd, KHOL_FG | KHOL_STDERR | KHOL_STDOUT);
+        }
+        // for `<` operator for redirection (stdin)
+        else if( !strcmp("<", args[j]) ) {
+            int fd = fileno(fopen(args[j+1], "r"));
+            args[j] = NULL;
+            return launch(args, fd, KHOL_FG | KHOL_STDIN);
         }
         j++;
     }

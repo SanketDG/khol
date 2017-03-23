@@ -50,3 +50,4 @@ char *builtins[] = {
 #define KHOL_BG 0x02
 #define KHOL_STDOUT 0x04
 #define KHOL_STDERR 0x08
+#define KHOL_STDIN 0x10
