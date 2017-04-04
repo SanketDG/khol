@@ -8,6 +8,8 @@ Sign graphic by <a href="http://www.flaticon.com/authors/freepik">Freepik</a> fr
 
 ## Install
 
+The only dependency is the [GNU readline library](https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html).
+
 ```
 $ make
 ```
@@ -24,3 +26,4 @@ $ ./khol
 - Redirection
 - History
 - Recalling history through `!` & ~ `!-`
+- Piping (two processes)

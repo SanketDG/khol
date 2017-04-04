@@ -172,18 +172,18 @@ int khol_history(char **args) {
 }
 
 int pipe_launch(char** arg1, char** arg2) {
-    int fd[2];
+    int fd[2], pid;
 
     pipe(fd);
 
-    if(!fork()) {
+    if( (pid = fork()) == 0 ) {
         close(1);
         dup(fd[1]);
         close(fd[0]);
         launch(arg1, STDOUT_FILENO, KHOL_FG);
         exit(EXIT_FAILURE);
     }
-    else {
+    else if (pid > 0){
         close(0);
         dup(fd[0]);
         close(fd[1]);
