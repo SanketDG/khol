@@ -180,18 +180,14 @@ int pipe_launch(char** arg1, char** arg2) {
         close(1);
         dup(fd[1]);
         close(fd[0]);
-        if( execvp(arg1[0], arg1) == -1 ) {
-            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
-        }
+        launch(arg1, STDOUT_FILENO, KHOL_FG);
+        exit(EXIT_FAILURE);
     }
     else {
         close(0);
         dup(fd[0]);
         close(fd[1]);
-        if( execvp(arg2[0], arg2) == -1 ) {
-            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
-        }
-        return 1;
+        return launch(arg2, STDOUT_FILENO, KHOL_FG);
     }
 }
 
@@ -261,7 +257,6 @@ int execute(char **args) {
             arg2 = &args[j+1];
 
             return pipe_launch(args, arg2);
-            return 1;
         }
         j++;
     }
