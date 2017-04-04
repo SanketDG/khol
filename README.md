@@ -17,3 +17,10 @@ $ make
 ```
 $ ./khol
 ```
+
+## Features
+
+- Splits command based on whitespace
+- Redirection
+- History
+- Recalling history through `!` & ~ `!-`

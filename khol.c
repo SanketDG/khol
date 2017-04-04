@@ -171,6 +171,30 @@ int khol_history(char **args) {
     return launch(history_args, STDOUT_FILENO, KHOL_FG);
 }
 
+int pipe_launch(char** arg1, char** arg2) {
+    int fd[2];
+
+    pipe(fd);
+
+    if(!fork()) {
+        close(1);
+        dup(fd[1]);
+        close(fd[0]);
+        if( execvp(arg1[0], arg1) == -1 ) {
+            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
+        }
+    }
+    else {
+        close(0);
+        dup(fd[0]);
+        close(fd[1]);
+        if( execvp(arg2[0], arg2) == -1 ) {
+            fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
+        }
+        return 1;
+    }
+}
+
 /* Function responsible for parsing the arguments */
 int execute(char **args) {
     int i;
@@ -228,6 +252,16 @@ int execute(char **args) {
             int fd = fileno(fopen(args[j+1], "r"));
             args[j] = NULL;
             return launch(args, fd, KHOL_FG | KHOL_STDIN);
+        }
+        // for piping
+        else if( !strcmp("|", args[j]) ) {
+            char** arg2;
+            int i = 0;
+            args[j] = NULL;
+            arg2 = &args[j+1];
+
+            return pipe_launch(args, arg2);
+            return 1;
         }
         j++;
     }
