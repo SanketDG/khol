@@ -176,6 +176,8 @@ int pipe_launch(char** arg1, char** arg2) {
 
     pipe(fd);
 
+    int stdin_copy = dup(STDIN_FILENO);
+
     if( (pid = fork()) == 0 ) {
         close(1);
         dup(fd[1]);
@@ -187,7 +189,9 @@ int pipe_launch(char** arg1, char** arg2) {
         close(0);
         dup(fd[0]);
         close(fd[1]);
-        return launch(arg2, STDOUT_FILENO, KHOL_FG);
+        launch(arg2, STDOUT_FILENO, KHOL_FG);
+        dup2(stdin_copy, STDIN_FILENO);
+        return 1;
     }
 }
 
