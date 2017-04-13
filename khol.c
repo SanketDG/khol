@@ -321,7 +321,7 @@ void main_loop(void) {
     char *line;
     char **args;
 
-    int status;
+    int status, index;
 
     // get prompt
     char *prompt;
@@ -352,16 +352,14 @@ void main_loop(void) {
             // write to history file
             write_history(history_path);
 
-            if(line[0] == '!' && !line[1]) {
-                int index;
+            if(line[0] == '!' && line[1] == '-') {
+                sscanf(line, "!-%d", &index);
+                args = split_line(history_get(history_length - index)->line);
+
+            }
+            else if(line[0] == '!' ) {
                 sscanf(line, "!%d", &index);
                 args = split_line(history_get(index)->line);
-            }
-            else if(line[0] == '!' && line[1] == '-') {
-                int index;
-                sscanf(line, "!-%d", &index);
-
-                args = split_line(history_get(history_length - index + 1)->line);
             }
             else {
                 args = split_line(line);
