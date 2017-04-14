@@ -109,10 +109,10 @@ int khol_exit(char **args)
  */
 int launch(char **args, int fd, int options) {
 
-    int khol_bg = 1 ? (options & KHOL_BG) : 0;
-    int khol_stdout = 1 ? (options & KHOL_STDOUT) : 0;
-    int khol_stderr = 1 ? (options & KHOL_STDERR) : 0;
-    int khol_stdin = 1 ? (options & KHOL_STDIN) : 0;
+    int khol_bg = (options & KHOL_BG) ? 1 : 0;
+    int khol_stdout = (options & KHOL_STDOUT) ? 1 : 0;
+    int khol_stderr = (options & KHOL_STDERR) ? 1 : 0;
+    int khol_stdin = (options & KHOL_STDIN) ? 1 : 0;
 
     pid_t pid, wpid;
 
