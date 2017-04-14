@@ -27,3 +27,8 @@ $ ./khol
 - History
 - Recalling history through `!` & ~ `!-`
 - Piping (two processes)
+
+## Links
+
+- [Tutorial - Write a shell in C (Primary Motivation)](https://brennan.io/2015/01/16/write-a-shell-in-c/)
+- [Writing your own shell](https://www.cs.cornell.edu/courses/cs414/2004su/homework/shell/shell.html)
