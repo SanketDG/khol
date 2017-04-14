@@ -273,7 +273,7 @@ char **split_line(char *line) {
     char **tokens = malloc(sizeof(char*) * TOKEN_BUFSIZE);
     char *token;
 
-    int bufsize_copy = TOKEN_BUFSIZE
+    int bufsize_copy = TOKEN_BUFSIZE;
     int pos = 0;
 
     if(!tokens) {
@@ -288,7 +288,7 @@ char **split_line(char *line) {
 
 
         if(pos >= bufsize_copy) {
-            bufsize_copy = bufsize_copy * 2
+            bufsize_copy = bufsize_copy * 2;
             tokens = realloc(tokens, sizeof(char*) * bufsize_copy);
 
             if(!tokens) {
@@ -318,6 +318,7 @@ char *get_prompt(void) {
         return prompt;
     }
     else {
+        free(prompt);
         return NULL;
     }
 }
@@ -361,11 +362,13 @@ void main_loop(void) {
             // write to history file
             write_history(history_path);
 
-            char* history_copy = (char*) malloc(MAX_BUFSIZE * sizeof(char*));
+            char* history_copy;
 
             if(line[0] == '!' && line[1] == '-') {
                 if(sscanf(line, "!-%d", &index) != EOF) {
-                    strcpy(history_copy, history_get(history_length - index)->line);
+                    HIST_ENTRY* hist_entry = history_get(history_length - index);
+                    history_copy = malloc(strlen(hist_entry->line)+1);
+                    strcpy(history_copy, hist_entry->line);
                     args = split_line(history_copy);
                 }
                 else
@@ -374,7 +377,9 @@ void main_loop(void) {
             }
             else if(line[0] == '!' ) {
                 if(sscanf(line, "!-%d", &index) != EOF) {
-                    strcpy(history_copy, history_get(index)->line);
+                    HIST_ENTRY* hist_entry = history_get(index);
+                    history_copy = malloc(strlen(hist_entry->line)+1);
+                    strcpy(history_copy, hist_entry->line);
                     args = split_line(history_copy);
                 }
                 else
@@ -391,6 +396,8 @@ void main_loop(void) {
             else {
                 status = 1;
             }
+
+            free(history_path);
         }
 
         free(prompt);
