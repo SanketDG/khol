@@ -179,14 +179,14 @@ int pipe_launch(char** arg1, char** arg2) {
     int stdin_copy = dup(STDIN_FILENO);
 
     if( (pid = fork()) == 0 ) {
-        close(1);
+        close(STDOUT_FILENO);
         dup(fd[1]);
         close(fd[0]);
         launch(arg1, STDOUT_FILENO, KHOL_FG);
         exit(EXIT_FAILURE);
     }
     else if (pid > 0){
-        close(0);
+        close(STDIN_FILENO);
         dup(fd[0]);
         close(fd[1]);
         launch(arg2, STDOUT_FILENO, KHOL_FG);
@@ -273,6 +273,7 @@ char **split_line(char *line) {
     char **tokens = malloc(sizeof(char*) * TOKEN_BUFSIZE);
     char *token;
 
+    int bufsize_copy = TOKEN_BUFSIZE
     int pos = 0;
 
     if(!tokens) {
@@ -285,10 +286,12 @@ char **split_line(char *line) {
         tokens[pos] = token;
         pos++;
 
-        if(pos >= TOKEN_BUFSIZE) {
-            tokens = realloc(tokens, sizeof(char*) * TOKEN_BUFSIZE * 2);
 
-            if(!token) {
+        if(pos >= bufsize_copy) {
+            bufsize_copy = bufsize_copy * 2
+            tokens = realloc(tokens, sizeof(char*) * bufsize_copy);
+
+            if(!tokens) {
                 fprintf(stderr, RED "khol: Memory allocation failed." RESET);
                 exit(EXIT_FAILURE);
             }
@@ -314,6 +317,9 @@ char *get_prompt(void) {
         snprintf(prompt, prompt_len, "%s > ", tempbuf);
         return prompt;
     }
+    else {
+        return NULL;
+    }
 }
 
 /* The main loop of the shell */
@@ -337,7 +343,10 @@ void main_loop(void) {
 
     do {
         // use GNU's readline() function
-        prompt = get_prompt();
+        if( (prompt = get_prompt()) == NULL) {
+            status = 0;
+            fprintf(stderr, RED "khol: Failed to get prompt.\n" RESET);
+        }
         line = readline(prompt);
 
 
@@ -384,7 +393,9 @@ void main_loop(void) {
             }
         }
 
+        free(prompt);
         free(line);
+
     } while ( status );
 
     free(history_path);
