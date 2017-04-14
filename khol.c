@@ -353,20 +353,31 @@ void main_loop(void) {
             write_history(history_path);
 
             if(line[0] == '!' && line[1] == '-') {
-                sscanf(line, "!-%d", &index);
-                args = split_line(history_get(history_length - index)->line);
+                if(sscanf(line, "!-%d", &index) != EOF) {
+                    args = split_line(history_copy);
+                }
+                else
+                    fprintf(stderr, RED "khol: Expected digit after '!-' for history recollection.\n." RESET);
 
             }
             else if(line[0] == '!' ) {
-                sscanf(line, "!%d", &index);
-                args = split_line(history_get(index)->line);
+                if(sscanf(line, "!-%d", &index) != EOF) {
+                    args = split_line(history_copy);
+                }
+                else
+                    fprintf(stderr, RED "khol: Expected digit after '!' for history recollection.\n" RESET);
             }
             else {
                 args = split_line(line);
             }
 
-            status = execute(args);
-            free(args);
+            if(args) {
+                status = execute(args);
+                free(args);
+            }
+            else {
+                status = 1;
+            }
         }
 
         free(line);
