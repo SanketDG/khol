@@ -352,8 +352,11 @@ void main_loop(void) {
             // write to history file
             write_history(history_path);
 
+            char* history_copy = (char*) malloc(MAX_BUFSIZE * sizeof(char*));
+
             if(line[0] == '!' && line[1] == '-') {
                 if(sscanf(line, "!-%d", &index) != EOF) {
+                    strcpy(history_copy, history_get(history_length - index)->line);
                     args = split_line(history_copy);
                 }
                 else
@@ -362,6 +365,7 @@ void main_loop(void) {
             }
             else if(line[0] == '!' ) {
                 if(sscanf(line, "!-%d", &index) != EOF) {
+                    strcpy(history_copy, history_get(index)->line);
                     args = split_line(history_copy);
                 }
                 else
