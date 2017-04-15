@@ -397,7 +397,7 @@ void main_loop(void) {
                 status = 1;
             }
 
-            free(history_path);
+            free(history_copy);
         }
 
         free(prompt);
