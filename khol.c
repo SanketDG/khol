@@ -97,6 +97,10 @@ int khol_exit(char **args)
     return 0;
 }
 
+void khol_exit_on_SIGINT(int signal) {
+    exit(0);
+}
+
 /*
  * Function that is responsible for launching and handling processes.
  *
@@ -149,6 +153,8 @@ int launch(char **args, int fd, int options) {
     } else if (pid < 0) {
         fprintf(stderr, RED "khol: %s\n" RESET, strerror(errno));
     } else {
+        // ignore SIGINT in parent process when child process is launched
+        signal(SIGINT, SIG_IGN);
         do {
             if( !khol_bg ) {
                 wpid = waitpid(pid, &status, WUNTRACED);
@@ -325,6 +331,8 @@ char *get_prompt(void) {
 
 /* The main loop of the shell */
 void main_loop(void) {
+
+    signal(SIGINT, khol_exit_on_SIGINT);
     char *line;
     char **args;
 
@@ -381,6 +389,7 @@ void main_loop(void) {
                     history_copy = malloc(strlen(hist_entry->line)+1);
                     strcpy(history_copy, hist_entry->line);
                     args = split_line(history_copy);
+                    free(history_copy);
                 }
                 else
                     fprintf(stderr, RED "khol: Expected digit after '!' for history recollection.\n" RESET);
@@ -397,7 +406,6 @@ void main_loop(void) {
                 status = 1;
             }
 
-            free(history_copy);
         }
 
         free(prompt);
